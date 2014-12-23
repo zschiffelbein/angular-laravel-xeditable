@@ -1,4 +1,6 @@
 /node_modules
 /playground
+/bower_components
+/.idea
 dev.html
 jsdoc.json

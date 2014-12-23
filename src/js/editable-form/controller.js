@@ -269,14 +269,11 @@ angular.module('xeditable').factory('editableFormController',
                     }
                 },
 
-                $listErrors: function (errorData) {
+                $listErrors: function (errors) {
                     this.$activate();
-                    if (errorData.data) {
-                        var errors = errorData.data;
-                        for (var fieldName in errors) {
-                            for (var errorKey in errors[fieldName]) {
-                                this.$setError(fieldName, errors[fieldName][errorKey]);
-                            }
+                    for (var fieldName in errors) {
+                        for (var errorKey in errors[fieldName]) {
+                            this.$setError(fieldName, errors[fieldName][errorKey]);
                         }
                     }
                 },

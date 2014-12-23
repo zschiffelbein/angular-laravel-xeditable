@@ -1111,14 +1111,11 @@ angular.module('xeditable').factory('editableFormController',
                     }
                 },
 
-                $listErrors: function (errorData) {
+                $listErrors: function (errors) {
                     this.$activate();
-                    if (errorData.data) {
-                        var errors = errorData.data;
-                        for (var fieldName in errors) {
-                            for (var errorKey in errors[fieldName]) {
-                                this.$setError(fieldName, errors[fieldName][errorKey]);
-                            }
+                    for (var fieldName in errors) {
+                        for (var errorKey in errors[fieldName]) {
+                            this.$setError(fieldName, errors[fieldName][errorKey]);
                         }
                     }
                 },
@@ -1397,8 +1394,8 @@ angular.module('xeditable').factory('editablePromiseCollection', ['$q', function
                         //some rejected
                         function (error) {
                             onWait(false);
-                            self.when(error, true);
-                            applyCallback(error);
+                            self.when(error.data, true);
+                            applyCallback(error.data);
                         }
                     );
                 } else {

@@ -52,8 +52,8 @@ angular.module('xeditable').factory('editablePromiseCollection', ['$q', function
                         //some rejected
                         function (error) {
                             onWait(false);
-                            self.when(error, true);
-                            applyCallback(error);
+                            self.when(error.data, true);
+                            applyCallback(error.data);
                         }
                     );
                 } else {
