@@ -1,7 +1,7 @@
 {
   "name": "angular-laravel-xeditable",
   "description": "Edit-in-place for angular.js and Laravel server-side validation",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "homepage": "https://github.com/zschiffelbein/angular-laravel-xeditable",
   "author": {
     "name": "Vitaliy Potapov",

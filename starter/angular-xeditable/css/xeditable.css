@@ -1,5 +1,5 @@
 /*!
-angular-laravel-xeditable - 0.1.8
+angular-laravel-xeditable - 0.2.0
 Edit-in-place for angular.js and Laravel server-side validation
 Build date: 2014-12-23 
 */
