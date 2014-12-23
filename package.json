@@ -1,15 +1,15 @@
 {
-  "name": "angular-xeditable",
-  "description": "Edit-in-place for angular.js",
+  "name": "angular-laravel-xeditable",
+  "description": "Edit-in-place for angular.js and Laravel server-side validation",
   "version": "0.1.8",
-  "homepage": "https://vitalets.github.io/angular-xeditable",
+  "homepage": "https://github.com/zschiffelbein/angular-laravel-xeditable",
   "author": {
     "name": "Vitaliy Potapov",
     "email": "noginsk@rambler.ru"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/vitalets/angular-xeditable.git"
+    "url": "git://github.com/zschiffelbein/angular-laravel-xeditable.git"
   },
   "engines": {
     "node": ">= 0.8.0"

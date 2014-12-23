@@ -1,62 +1,62 @@
 /*!
-angular-xeditable - 0.1.8
-Edit-in-place for angular.js
-Build date: 2014-01-10 
+angular-laravel-xeditable - 0.1.8
+Edit-in-place for angular.js and Laravel server-side validation
+Build date: 2014-12-23 
 */
 /**
- * Angular-xeditable module 
+ * Angular-Laravel-xeditable module
  *
  */
 angular.module('xeditable', [])
 
 
 /**
- * Default options. 
+ * Default options.
  *
  * @namespace editable-options
  */
 //todo: maybe better have editableDefaults, not options...
-.value('editableOptions', {
-  /**
-   * Theme. Possible values `bs3`, `bs2`, `default`.
-   * 
-   * @var {string} theme
-   * @memberOf editable-options
-   */  
-  theme: 'default',
-  /**
-   * Whether to show buttons for single editalbe element.  
-   * Possible values `right` (default), `no`.
-   * 
-   * @var {string} buttons
-   * @memberOf editable-options
-   */    
-  buttons: 'right',
-  /**
-   * Default value for `blur` attribute of single editable element.  
-   * Can be `cancel|submit|ignore`.
-   * 
-   * @var {string} blurElem
-   * @memberOf editable-options
-   */
-  blurElem: 'cancel',
-  /**
-   * Default value for `blur` attribute of editable form.  
-   * Can be `cancel|submit|ignore`.
-   * 
-   * @var {string} blurForm
-   * @memberOf editable-options
-   */
-  blurForm: 'ignore',
-  /**
-   * How input elements get activated. Possible values: `focus|select|none`.
-   *
-   * @var {string} activate
-   * @memberOf editable-options
-   */
-  activate: 'focus'
+    .value('editableOptions', {
+        /**
+         * Theme. Possible values `bs3`, `bs2`, `default`.
+         *
+         * @var {string} theme
+         * @memberOf editable-options
+         */
+        theme: 'default',
+        /**
+         * Whether to show buttons for single editalbe element.
+         * Possible values `right` (default), `no`.
+         *
+         * @var {string} buttons
+         * @memberOf editable-options
+         */
+        buttons: 'right',
+        /**
+         * Default value for `blur` attribute of single editable element.
+         * Can be `cancel|submit|ignore`.
+         *
+         * @var {string} blurElem
+         * @memberOf editable-options
+         */
+        blurElem: 'cancel',
+        /**
+         * Default value for `blur` attribute of editable form.
+         * Can be `cancel|submit|ignore`.
+         *
+         * @var {string} blurForm
+         * @memberOf editable-options
+         */
+        blurForm: 'ignore',
+        /**
+         * How input elements get activated. Possible values: `focus|select|none`.
+         *
+         * @var {string} activate
+         * @memberOf editable-options
+         */
+        activate: 'focus'
 
-});
+    });
 /*
 Angular-ui bootstrap datepicker
 http://angular-ui.github.io/bootstrap/#/datepicker
@@ -841,325 +841,345 @@ function($parse, $compile, editableThemes, $rootScope, $document, editableContro
 }]);
 
 /*
-Returns editableForm controller
-*/
-angular.module('xeditable').factory('editableFormController', 
-  ['$parse', '$document', '$rootScope', 'editablePromiseCollection', 'editableUtils',
-  function($parse, $document, $rootScope, editablePromiseCollection, editableUtils) {
+ Returns editableForm controller
+ */
+angular.module('xeditable').factory('editableFormController',
+    ['$parse', '$document', '$rootScope', 'editablePromiseCollection', 'editableUtils',
+        function ($parse, $document, $rootScope, editablePromiseCollection, editableUtils) {
 
-  // array of opened editable forms
-  var shown = [];
+            // array of opened editable forms
+            var shown = [];
 
-  // bind click to body: cancel|submit|ignore forms
-  $document.bind('click', function(e) {
-    // ignore right/middle button click
-    if (e.which !== 1) {
-      return;
-    }
+            // bind click to body: cancel|submit|ignore forms
+            $document.bind('click', function (e) {
+                // ignore right/middle button click
+                if (e.which !== 1) {
+                    return;
+                }
 
-    var toCancel = [];
-    var toSubmit = [];
-    for (var i=0; i<shown.length; i++) {
+                var toCancel = [];
+                var toSubmit = [];
+                for (var i = 0; i < shown.length; i++) {
 
-      // exclude clicked
-      if (shown[i]._clicked) {
-        shown[i]._clicked = false;
-        continue;
-      }
+                    // exclude clicked
+                    if (shown[i]._clicked) {
+                        shown[i]._clicked = false;
+                        continue;
+                    }
 
-      // exclude waiting
-      if (shown[i].$waiting) {
-        continue;
-      }
+                    // exclude waiting
+                    if (shown[i].$waiting) {
+                        continue;
+                    }
 
-      if (shown[i]._blur === 'cancel') {
-        toCancel.push(shown[i]);
-      }
+                    if (shown[i]._blur === 'cancel') {
+                        toCancel.push(shown[i]);
+                    }
 
-      if (shown[i]._blur === 'submit') {
-        toSubmit.push(shown[i]);
-      }
-    }
+                    if (shown[i]._blur === 'submit') {
+                        toSubmit.push(shown[i]);
+                    }
+                }
 
-    if (toCancel.length || toSubmit.length) {
-      $rootScope.$apply(function() {
-        angular.forEach(toCancel, function(v){ v.$cancel(); });
-        angular.forEach(toSubmit, function(v){ v.$submit(); });
-      });
-    }
-  });
- 
+                if (toCancel.length || toSubmit.length) {
+                    $rootScope.$apply(function () {
+                        angular.forEach(toCancel, function (v) {
+                            v.$cancel();
+                        });
+                        angular.forEach(toSubmit, function (v) {
+                            v.$submit();
+                        });
+                    });
+                }
+            });
 
-  var base = {
-    $addEditable: function(editable) {
-      //console.log('add editable', editable.elem, editable.elem.bind);
-      this.$editables.push(editable);
 
-      //'on' is not supported in angular 1.0.8
-      editable.elem.bind('$destroy', angular.bind(this, this.$removeEditable, editable));
+            var base = {
+                $addEditable: function (editable) {
+                    //console.log('add editable', editable.elem, editable.elem.bind);
+                    this.$editables.push(editable);
 
-      //bind editable's local $form to self (if not bound yet, below form) 
-      if (!editable.scope.$form) {
-        editable.scope.$form = this;
-      }
+                    //'on' is not supported in angular 1.0.8
+                    editable.elem.bind('$destroy', angular.bind(this, this.$removeEditable, editable));
 
-      //if form already shown - call show() of new editable
-      if (this.$visible) {
-        editable.catchError(editable.show());
-      }
-    },
+                    //bind editable's local $form to self (if not bound yet, below form)
+                    if (!editable.scope.$form) {
+                        editable.scope.$form = this;
+                    }
 
-    $removeEditable: function(editable) {
-      //arrayRemove
-      for(var i=0; i < this.$editables.length; i++) {
-        if(this.$editables[i] === editable) {
-          this.$editables.splice(i, 1);
-          return;
-        }
-      }
-    },
+                    //if form already shown - call show() of new editable
+                    if (this.$visible) {
+                        editable.catchError(editable.show());
+                    }
+                },
 
-    /**
-     * Shows form with editable controls.
-     * 
-     * @method $show()
-     * @memberOf editable-form
-     */
-    $show: function() {
-      if (this.$visible) {
-        return;
-      }
+                $removeEditable: function (editable) {
+                    //arrayRemove
+                    for (var i = 0; i < this.$editables.length; i++) {
+                        if (this.$editables[i] === editable) {
+                            this.$editables.splice(i, 1);
+                            return;
+                        }
+                    }
+                },
 
-      this.$visible = true;
+                /**
+                 * Shows form with editable controls.
+                 *
+                 * @method $show()
+                 * @memberOf editable-form
+                 */
+                $show: function () {
+                    if (this.$visible) {
+                        return;
+                    }
 
-      var pc = editablePromiseCollection();
+                    this.$visible = true;
 
-      //own show
-      pc.when(this.$onshow());
+                    var pc = editablePromiseCollection();
 
-      //clear errors
-      this.$setError(null, '');
+                    //own show
+                    pc.when(this.$onshow());
 
-      //children show
-      angular.forEach(this.$editables, function(editable) {
-        pc.when(editable.show());
-      });
+                    //clear errors
+                    this.$setError(null, '');
 
-      //wait promises and activate
-      pc.then({
-        onWait: angular.bind(this, this.$setWaiting), 
-        onTrue: angular.bind(this, this.$activate), 
-        onFalse: angular.bind(this, this.$activate), 
-        onString: angular.bind(this, this.$activate)
-      });
+                    //children show
+                    angular.forEach(this.$editables, function (editable) {
+                        pc.when(editable.show());
+                    });
 
-      // add to internal list of shown forms
-      // setTimeout needed to prevent closing right after opening (e.g. when trigger by button)
-      setTimeout(angular.bind(this, function() {
-        // clear `clicked` to get ready for clicks on visible form
-        this._clicked = false;
-        if(editableUtils.indexOf(shown, this) === -1) {
-          shown.push(this);
-        }
-      }), 0);      
-    },
+                    //wait promises and activate
+                    pc.then({
+                        onWait: angular.bind(this, this.$setWaiting),
+                        onTrue: angular.bind(this, this.$activate),
+                        onFalse: angular.bind(this, this.$activate),
+                        onString: angular.bind(this, this.$activate),
+                        onObject: angular.bind(this, this.$activate)
+                    });
 
-    /**
-     * Sets focus on form field specified by `name`.
-     * 
-     * @method $activate(name)
-     * @param {string} name name of field
-     * @memberOf editable-form
-     */
-    $activate: function(name) {
-      var i;
-      if (this.$editables.length) {
-        //activate by name
-        if (angular.isString(name)) {
-          for(i=0; i<this.$editables.length; i++) {
-            if (this.$editables[i].name === name) {
-              this.$editables[i].activate();
-              return;
-            }
-          }
-        }
+                    // add to internal list of shown forms
+                    // setTimeout needed to prevent closing right after opening (e.g. when trigger by button)
+                    setTimeout(angular.bind(this, function () {
+                        // clear `clicked` to get ready for clicks on visible form
+                        this._clicked = false;
+                        if (editableUtils.indexOf(shown, this) === -1) {
+                            shown.push(this);
+                        }
+                    }), 0);
+                },
 
-        //try activate error field
-        for(i=0; i<this.$editables.length; i++) {
-          if (this.$editables[i].error) {
-            this.$editables[i].activate();
-            return;
-          }
-        }
+                /**
+                 * Sets focus on form field specified by `name`.
+                 *
+                 * @method $activate(name)
+                 * @param {string} name name of field
+                 * @memberOf editable-form
+                 */
+                $activate: function (name) {
+                    var i;
+                    if (this.$editables.length) {
+                        //activate by name
+                        if (angular.isString(name)) {
+                            for (i = 0; i < this.$editables.length; i++) {
+                                if (this.$editables[i].name === name) {
+                                    this.$editables[i].activate();
+                                    return;
+                                }
+                            }
+                        }
 
-        //by default activate first field
-        this.$editables[0].activate();
-      }
-    },
+                        //try activate error field
+                        for (i = 0; i < this.$editables.length; i++) {
+                            if (this.$editables[i].error) {
+                                this.$editables[i].activate();
+                                return;
+                            }
+                        }
 
-    /**
-     * Hides form with editable controls without saving.
-     * 
-     * @method $hide()
-     * @memberOf editable-form
-     */
-    $hide: function() {
-      if (!this.$visible) {
-        return;
-      }      
-      this.$visible = false;
-      // self hide
-      this.$onhide();
-      // children's hide
-      angular.forEach(this.$editables, function(editable) {
-        editable.hide();
-      });
+                        //by default activate first field
+                        this.$editables[0].activate();
+                    }
+                },
 
-      // remove from internal list of shown forms
-      editableUtils.arrayRemove(shown, this);
-    },
+                /**
+                 * Hides form with editable controls without saving.
+                 *
+                 * @method $hide()
+                 * @memberOf editable-form
+                 */
+                $hide: function () {
+                    if (!this.$visible) {
+                        return;
+                    }
+                    this.$visible = false;
+                    // self hide
+                    this.$onhide();
+                    // children's hide
+                    angular.forEach(this.$editables, function (editable) {
+                        editable.hide();
+                    });
 
-    /**
-     * Triggers `oncancel` event and calls `$hide()`.
-     * 
-     * @method $cancel()
-     * @memberOf editable-form
-     */
-    $cancel: function() {
-      if (!this.$visible) {
-        return;
-      }      
-      // self cancel
-      this.$oncancel();
-      // children's cancel      
-      angular.forEach(this.$editables, function(editable) {
-        editable.cancel();
-      });
-      // self hide
-      this.$hide();
-    },    
+                    // remove from internal list of shown forms
+                    editableUtils.arrayRemove(shown, this);
+                },
 
-    $setWaiting: function(value) {
-      this.$waiting = !!value;
-      // we can't just set $waiting variable and use it via ng-disabled in children
-      // because in editable-row form is not accessible
-      angular.forEach(this.$editables, function(editable) {
-        editable.setWaiting(!!value);
-      });
-    },
+                /**
+                 * Triggers `oncancel` event and calls `$hide()`.
+                 *
+                 * @method $cancel()
+                 * @memberOf editable-form
+                 */
+                $cancel: function () {
+                    if (!this.$visible) {
+                        return;
+                    }
+                    // self cancel
+                    this.$oncancel();
+                    // children's cancel
+                    angular.forEach(this.$editables, function (editable) {
+                        editable.cancel();
+                    });
+                    // self hide
+                    this.$hide();
+                },
 
-    /**
-     * Shows error message for particular field.
-     * 
-     * @method $setError(name, msg)
-     * @param {string} name name of field
-     * @param {string} msg error message
-     * @memberOf editable-form
-     */
-    $setError: function(name, msg) {
-      angular.forEach(this.$editables, function(editable) {
-        if(!name || editable.name === name) {
-          editable.setError(msg);
-        }
-      });
-    },
+                $setWaiting: function (value) {
+                    this.$waiting = !!value;
+                    // we can't just set $waiting variable and use it via ng-disabled in children
+                    // because in editable-row form is not accessible
+                    angular.forEach(this.$editables, function (editable) {
+                        editable.setWaiting(!!value);
+                    });
+                },
 
-    $submit: function() {
-      if (this.$waiting) {
-        return;
-      } 
+                /**
+                 * Shows error message for particular field.
+                 *
+                 * @method $setError(name, msg)
+                 * @param {string} name name of field
+                 * @param {string} msg error message
+                 * @memberOf editable-form
+                 */
+                $setError: function (name, msg) {
+                    angular.forEach(this.$editables, function (editable) {
+                        if (!name || editable.name === name) {
+                            editable.setError(msg);
+                        }
+                    });
+                },
 
-      //clear errors
-      this.$setError(null, '');
+                $submit: function () {
+                    if (this.$waiting) {
+                        return;
+                    }
 
-      //children onbeforesave
-      var pc = editablePromiseCollection();
-      angular.forEach(this.$editables, function(editable) {
-        pc.when(editable.onbeforesave());
-      });
+                    //clear errors
+                    this.$setError(null, '');
 
-      /*
-      onbeforesave result:
-      - true/undefined: save data and close form
-      - false: close form without saving
-      - string: keep form open and show error
-      */
-      pc.then({
-        onWait: angular.bind(this, this.$setWaiting), 
-        onTrue: angular.bind(this, checkSelf, true), 
-        onFalse: angular.bind(this, checkSelf, false), 
-        onString: angular.bind(this, this.$activate)
-      });
+                    //children onbeforesave
+                    var pc = editablePromiseCollection();
+                    angular.forEach(this.$editables, function (editable) {
+                        pc.when(editable.onbeforesave());
+                    });
 
-      //save
-      function checkSelf(childrenTrue){
-        var pc = editablePromiseCollection();
-        pc.when(this.$onbeforesave());
-        pc.then({
-          onWait: angular.bind(this, this.$setWaiting), 
-          onTrue: childrenTrue ? angular.bind(this, this.$save) : angular.bind(this, this.$hide), 
-          onFalse: angular.bind(this, this.$hide), 
-          onString: angular.bind(this, this.$activate)
-        });
-      }
-    },
+                    /*
+                     onbeforesave result:
+                     - true/undefined: save data and close form
+                     - false: close form without saving
+                     - string: keep form open and show error
+                     */
+                    pc.then({
+                        onWait: angular.bind(this, this.$setWaiting),
+                        onTrue: angular.bind(this, checkSelf, true),
+                        onFalse: angular.bind(this, checkSelf, false),
+                        onString: angular.bind(this, this.$activate),
+                        onObject: angular.bind(this, this.$listErrors)
+                    });
 
-    $save: function() {
-      // write model for each editable
-      angular.forEach(this.$editables, function(editable) {
-        editable.save();
-      });
+                    //save
+                    function checkSelf(childrenTrue) {
+                        var pc = editablePromiseCollection();
+                        pc.when(this.$onbeforesave());
+                        pc.then({
+                            onWait: angular.bind(this, this.$setWaiting),
+                            onTrue: childrenTrue ? angular.bind(this, this.$save) : angular.bind(this, this.$hide),
+                            onFalse: angular.bind(this, this.$hide),
+                            onString: angular.bind(this, this.$activate),
+                            onObject: angular.bind(this, this.$listErrors)
+                        });
+                    }
+                },
 
-      //call onaftersave of self and children
-      var pc = editablePromiseCollection();
-      pc.when(this.$onaftersave());
-      angular.forEach(this.$editables, function(editable) {
-        pc.when(editable.onaftersave());
-      });
+                $listErrors: function (errorData) {
+                    this.$activate();
+                    if (errorData.data) {
+                        var errors = errorData.data;
+                        for (var fieldName in errors) {
+                            for (var errorKey in errors[fieldName]) {
+                                this.$setError(fieldName, errors[fieldName][errorKey]);
+                            }
+                        }
+                    }
+                },
 
-      /*
-      onaftersave result:
-      - true/undefined/false: just close form
-      - string: keep form open and show error
-      */
-      pc.then({
-        onWait: angular.bind(this, this.$setWaiting), 
-        onTrue: angular.bind(this, this.$hide), 
-        onFalse: angular.bind(this, this.$hide), 
-        onString: angular.bind(this, this.$activate)
-      });
-    },
+                $save: function () {
+                    // write model for each editable
+                    angular.forEach(this.$editables, function (editable) {
+                        editable.save();
+                    });
 
-    $onshow: angular.noop,
-    $oncancel: angular.noop,
-    $onhide: angular.noop,
-    $onbeforesave: angular.noop,
-    $onaftersave: angular.noop
-  };
+                    //call onaftersave of self and children
+                    var pc = editablePromiseCollection();
+                    pc.when(this.$onaftersave());
+                    angular.forEach(this.$editables, function (editable) {
+                        pc.when(editable.onaftersave());
+                    });
 
-  return function() {
-    return angular.extend({
-      $editables: [],
-      /**
-       * Form visibility flag.
-       * 
-       * @var {bool} $visible
-       * @memberOf editable-form
-       */
-      $visible: false,
-      /**
-       * Form waiting flag. It becomes `true` when form is loading or saving data.
-       * 
-       * @var {bool} $waiting
-       * @memberOf editable-form
-       */
-      $waiting: false,
-      $data: {},
-      _clicked: false,
-      _blur: null
-    }, base);
-  };
-}]);
+                    /*
+                     onaftersave result:
+                     - true/undefined/false: just close form
+                     - string: keep form open and show error
+                     */
+                    pc.then({
+                        onWait: angular.bind(this, this.$setWaiting),
+                        onTrue: angular.bind(this, this.$hide),
+                        onFalse: angular.bind(this, this.$hide),
+                        onString: angular.bind(this, this.$activate),
+                        onObject: angular.bind(this, this.$listErrors)
+                    });
+                },
+
+                $onshow: angular.noop,
+                $oncancel: angular.noop,
+                $onhide: angular.noop,
+                $onbeforesave: angular.noop,
+                $onaftersave: angular.noop
+            };
+
+            return function () {
+                return angular.extend({
+                    $editables: [],
+                    /**
+                     * Form visibility flag.
+                     *
+                     * @var {bool} $visible
+                     * @memberOf editable-form
+                     */
+                    $visible: false,
+                    /**
+                     * Form waiting flag. It becomes `true` when form is loading or saving data.
+                     *
+                     * @var {bool} $waiting
+                     * @memberOf editable-form
+                     */
+                    $waiting: false,
+                    $data: {},
+                    _clicked: false,
+                    _blur: null
+                }, base);
+            };
+        }]);
 
 /**
  * EditableForm directive. Should be defined in <form> containing editable controls.  
@@ -1325,121 +1345,126 @@ angular.module('xeditable').directive('editableForm',
 }]);
 /**
  * editablePromiseCollection
- *  
- * Collect results of function calls. Shows waiting if there are promises. 
+ *
+ * Collect results of function calls. Shows waiting if there are promises.
  * Finally, applies callbacks if:
  * - onTrue(): all results are true and all promises resolved to true
  * - onFalse(): at least one result is false or promise resolved to false
  * - onString(): at least one result is string or promise rejected or promise resolved to string
+ * - onObject(): at least one result is an object or promis rejected
  */
-angular.module('xeditable').factory('editablePromiseCollection', ['$q', function($q) { 
+angular.module('xeditable').factory('editablePromiseCollection', ['$q', function ($q) {
 
-  function promiseCollection() {
-    return {
-      promises: [],
-      hasFalse: false,
-      hasString: false,
-      when: function(result, noPromise) {
-        if (result === false) {
-          this.hasFalse = true;
-        } else if (!noPromise && angular.isObject(result)) {
-          this.promises.push($q.when(result));
-        } else if (angular.isString(result)){
-          this.hasString = true;
-        } else { //result === true || result === undefined || result === null
-          return;
-        }
-      },
-      //callbacks: onTrue, onFalse, onString
-      then: function(callbacks) {
-        callbacks = callbacks || {};
-        var onTrue = callbacks.onTrue || angular.noop;
-        var onFalse = callbacks.onFalse || angular.noop;
-        var onString = callbacks.onString || angular.noop;
-        var onWait = callbacks.onWait || angular.noop;
-
-        var self = this;
-
-        if (this.promises.length) {
-          onWait(true);
-          $q.all(this.promises).then(
-            //all resolved       
-            function(results) {
-              onWait(false);
-              //check all results via same `when` method (without checking promises)
-              angular.forEach(results, function(result) {
-                self.when(result, true);  
-              });
-              applyCallback();
+    function promiseCollection() {
+        return {
+            promises: [],
+            hasFalse: false,
+            hasString: false,
+            hasObject: false,
+            when: function (result, noPromise) {
+                if (result === false) {
+                    this.hasFalse = true;
+                } else if (!noPromise && angular.isObject(result)) {
+                    this.promises.push($q.when(result));
+                } else if (angular.isObject(result)) {
+                    this.hasObject = true;
+                } else if (angular.isString(result)) {
+                    this.hasString = true;
+                } else { //result === true || result === undefined || result === null
+                    return;
+                }
             },
-            //some rejected
-            function(error) { 
-              onWait(false);
-              onString();
+            //callbacks: onTrue, onFalse, onString
+            then: function (callbacks) {
+                callbacks = callbacks || {};
+                var onTrue = callbacks.onTrue || angular.noop;
+                var onFalse = callbacks.onFalse || angular.noop;
+                var onString = callbacks.onString || angular.noop;
+                var onObject = callbacks.onObject || angular.noop;
+                var onWait = callbacks.onWait || angular.noop;
+
+                var self = this;
+
+                if (this.promises.length) {
+                    onWait(true);
+                    $q.all(this.promises).then(
+                        //all resolved
+                        function (results) {
+                            onWait(false);
+                            // Do not process response. Always assume true
+                            applyCallback();
+                        },
+                        //some rejected
+                        function (error) {
+                            onWait(false);
+                            self.when(error, true);
+                            applyCallback(error);
+                        }
+                    );
+                } else {
+                    applyCallback();
+                }
+
+                function applyCallback(response) {
+                    if (!self.hasString && !self.hasFalse && !self.hasObject) {
+                        onTrue();
+                    } else if (!self.hasString && self.hasFalse) {
+                        onFalse();
+                    } else if (self.hasObject) {
+                        onObject(response);
+                    } else {
+                        onString(response);
+                    }
+                }
+
             }
-          );
-        } else {
-          applyCallback();
-        }
+        };
+    }
 
-        function applyCallback() {
-          if (!self.hasString && !self.hasFalse) {
-            onTrue();
-          } else if (!self.hasString && self.hasFalse) {
-            onFalse();
-          } else {
-            onString();
-          }
-        }
-
-      }
-    };
-  }
-
-  return promiseCollection;
+    return promiseCollection;
 
 }]);
 
 /**
  * editableUtils
  */
-angular.module('xeditable').factory('editableUtils', [function() {
-  return {
-    indexOf: function (array, obj) {
-      if (array.indexOf) return array.indexOf(obj);
+angular.module('xeditable').factory('editableUtils', [function () {
+    return {
+        indexOf: function (array, obj) {
+            if (array.indexOf) return array.indexOf(obj);
 
-      for ( var i = 0; i < array.length; i++) {
-        if (obj === array[i]) return i;
-      }
-      return -1;
-    },
+            for (var i = 0; i < array.length; i++) {
+                if (obj === array[i]) return i;
+            }
+            return -1;
+        },
 
-    arrayRemove: function (array, value) {
-      var index = this.indexOf(array, value);
-      if (index >= 0) {
-        array.splice(index, 1);
-      }
-      return value;
-    },
+        arrayRemove: function (array, value) {
+            var index = this.indexOf(array, value);
+            if (index >= 0) {
+                array.splice(index, 1);
+            }
+            return value;
+        },
 
-    // copy from https://github.com/angular/angular.js/blob/master/src/Angular.js
-    camelToDash: function(str) {
-      var SNAKE_CASE_REGEXP = /[A-Z]/g;
-      return str.replace(SNAKE_CASE_REGEXP, function(letter, pos) {
-        return (pos ? '-' : '') + letter.toLowerCase();
-      });
-    },
+        // copy from https://github.com/angular/angular.js/blob/master/src/Angular.js
+        camelToDash: function (str) {
+            var SNAKE_CASE_REGEXP = /[A-Z]/g;
+            return str.replace(SNAKE_CASE_REGEXP, function (letter, pos) {
+                return (pos ? '-' : '') + letter.toLowerCase();
+            });
+        },
 
-    dashToCamel: function(str) {
-      var SPECIAL_CHARS_REGEXP = /([\:\-\_]+(.))/g;
-      var MOZ_HACK_REGEXP = /^moz([A-Z])/;
-      return str.
-        replace(SPECIAL_CHARS_REGEXP, function(_, separator, letter, offset) {
-          return offset ? letter.toUpperCase() : letter;
-        }).
-        replace(MOZ_HACK_REGEXP, 'Moz$1');
-    }
-  };
+        dashToCamel: function (str) {
+            var SPECIAL_CHARS_REGEXP = /([\:\-\_]+(.))/g;
+            var MOZ_HACK_REGEXP = /^moz([A-Z])/;
+            return str.
+                replace(SPECIAL_CHARS_REGEXP, function (_, separator, letter, offset) {
+                    return offset ? letter.toUpperCase() : letter;
+                }).
+                replace(MOZ_HACK_REGEXP, 'Moz$1');
+        }
+    };
 }]);
 
 /**
@@ -1448,51 +1473,51 @@ angular.module('xeditable').factory('editableUtils', [function() {
  * see: https://github.com/angular/angular.js/blob/master/src/ng/directive/select.js#L131
  */
 angular.module('xeditable').factory('editableNgOptionsParser', [
-  function() {
-                        //0000111110000000000022220000000000000000000000333300000000000000444444444444444000000000555555555555555000000066666666666666600000000000000007777000000000000000000088888
-  var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+(.*?)(?:\s+track\s+by\s+(.*?))?$/;
- 
-  function parser(optionsExp) {
-    var match;
+    function () {
+        //0000111110000000000022220000000000000000000000333300000000000000444444444444444000000000555555555555555000000066666666666666600000000000000007777000000000000000000088888
+        var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+(.*?)(?:\s+track\s+by\s+(.*?))?$/;
 
-    if (! (match = optionsExp.match(NG_OPTIONS_REGEXP))) {
-      throw 'ng-options parse error';
-    }
+        function parser(optionsExp) {
+            var match;
 
-    var 
-        displayFn = match[2] || match[1],
-        valueName = match[4] || match[6],
-        keyName = match[5],
-        groupByFn = match[3] || '',
-        valueFn = match[2] ? match[1] : valueName,
-        valuesFn = match[7],
-        track = match[8],
-        trackFn = track ? match[8] : null;
+            if (!(match = optionsExp.match(NG_OPTIONS_REGEXP))) {
+                throw 'ng-options parse error';
+            }
 
-    var ngRepeat;
-    if (keyName === undefined) { // array
-      ngRepeat = valueName + ' in ' + valuesFn;
-      if (track !== undefined) {
-        ngRepeat += ' track by '+trackFn;
-      }
-    } else { // object
-      ngRepeat = '('+keyName+', '+valueName+') in '+valuesFn;
-    }
-    
-    // group not supported yet
-    return {
-      ngRepeat: ngRepeat,
-      locals: {
-        valueName: valueName,
-        keyName: keyName,
-        valueFn: valueFn,
-        displayFn: displayFn
-      }
-    };
-  }
+            var
+                displayFn = match[2] || match[1],
+                valueName = match[4] || match[6],
+                keyName = match[5],
+                groupByFn = match[3] || '',
+                valueFn = match[2] ? match[1] : valueName,
+                valuesFn = match[7],
+                track = match[8],
+                trackFn = track ? match[8] : null;
 
-  return parser;
-}]);
+            var ngRepeat;
+            if (keyName === undefined) { // array
+                ngRepeat = valueName + ' in ' + valuesFn;
+                if (track !== undefined) {
+                    ngRepeat += ' track by ' + trackFn;
+                }
+            } else { // object
+                ngRepeat = '(' + keyName + ', ' + valueName + ') in ' + valuesFn;
+            }
+
+            // group not supported yet
+            return {
+                ngRepeat: ngRepeat,
+                locals: {
+                    valueName: valueName,
+                    keyName: keyName,
+                    valueFn: valueFn,
+                    displayFn: displayFn
+                }
+            };
+        }
+
+        return parser;
+    }]);
 
 /*
 Editable themes:
