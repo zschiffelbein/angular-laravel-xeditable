@@ -11,8 +11,8 @@ Inside it does several things:
 Depends on: editableController, editableFormFactory
 */
 angular.module('xeditable').factory('editableDirectiveFactory',
-['$parse', '$compile', 'editableThemes', '$rootScope', '$document', 'editableController', 'editableFormController',
-function($parse, $compile, editableThemes, $rootScope, $document, editableController, editableFormController) {
+['$parse', '$compile', 'editableThemes', '$rootScope', '$document', 'editableController', 'editableFormController', 'editableOptions',
+function($parse, $compile, editableThemes, $rootScope, $document, editableController, editableFormController, editableOptions) {
 
   //directive object
   return function(overwrites) {
@@ -77,6 +77,15 @@ function($parse, $compile, editableThemes, $rootScope, $document, editableContro
         // merge overwrites to base editable controller
         angular.extend(eCtrl, overwrites);
 
+        // x-editable can be disabled using editableOption or edit-disabled attribute
+        var disabled = angular.isDefined(attrs.editDisabled) ?
+          scope.$eval(attrs.editDisabled) :
+          editableOptions.isDisabled;
+
+        if (disabled) {
+          return;
+        }
+        
         // init editable ctrl
         eCtrl.init(!hasForm);
 
@@ -114,9 +123,9 @@ function($parse, $compile, editableThemes, $rootScope, $document, editableContro
           }
 
           // bind click - if no external form defined
-          if(!attrs.eForm) {
+          if(!attrs.eForm || attrs.eClickable) {
             elem.addClass('editable-click');
-            elem.bind('click', function(e) {
+            elem.bind(editableOptions.activationEvent, function(e) {
               e.preventDefault();
               e.editable = eCtrl;
               scope.$apply(function(){

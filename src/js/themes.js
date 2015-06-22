@@ -28,9 +28,9 @@ angular.module('xeditable').factory('editableThemes', function() {
       inputTpl:    '',
       errorTpl:    '<div class="editable-error help-block" ng-show="$error" ng-bind="$error"></div>',
       buttonsTpl:  '<span class="editable-buttons"></span>',
-      submitTpl:   '<button type="submit" class="btn btn-primary"><span class="icon-ok icon-white"></span></button>',
+      submitTpl:   '<button type="submit" class="btn btn-primary"><span></span></button>',
       cancelTpl:   '<button type="button" class="btn" ng-click="$form.$cancel()">'+
-                      '<span class="icon-remove"></span>'+
+                      '<span></span>'+
                    '</button>'
 
     },
@@ -43,9 +43,9 @@ angular.module('xeditable').factory('editableThemes', function() {
       inputTpl:    '',
       errorTpl:    '<div class="editable-error help-block" ng-show="$error" ng-bind="$error"></div>',
       buttonsTpl:  '<span class="editable-buttons"></span>',
-      submitTpl:   '<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-ok"></span></button>',
+      submitTpl:   '<button type="submit" class="btn btn-primary"><span></span></button>',
       cancelTpl:   '<button type="button" class="btn btn-default" ng-click="$form.$cancel()">'+
-                     '<span class="glyphicon glyphicon-remove"></span>'+
+                     '<span></span>'+
                    '</button>',
 
       //bs3 specific prop to change buttons class: btn-sm, btn-lg
@@ -65,6 +65,7 @@ angular.module('xeditable').factory('editableThemes', function() {
           case 'editableSearch':
           case 'editableDate':
           case 'editableDatetime':
+          case 'editableBsdate':
           case 'editableTime':
           case 'editableMonth':
           case 'editableWeek':
@@ -79,6 +80,8 @@ angular.module('xeditable').factory('editableThemes', function() {
               this.inputEl.addClass(this.theme.inputClass);
             }
           break;
+          case 'editableCheckbox':
+              this.editorEl.addClass('checkbox');
         }
 
         //apply buttonsClass (bs3 specific!)

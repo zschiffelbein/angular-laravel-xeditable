@@ -19,6 +19,8 @@
     <script src="libs/bootstrap/3.0.0/js/bootstrap.js"></script>
     <!--angular-ui-bootstrap-->
     <script src="libs/angular-ui/bootstrap/ui-bootstrap-tpls-0.6.0.min.js"></script>
+    <!--moment-->
+    <script src="libs/moment.min.2.5.0.js"></script>
     <!--google-code-prettify-->
     <script src="libs/google-code-prettify/run_prettify.js"></script>
     <!--checklist-model-->
@@ -39,7 +41,7 @@
             <li class="active"><a href="#">Home</a></li>
             <li><a href="https://github.com/vitalets/angular-xeditable">Github</a></li>
           </ul>
-          <form class="navbar-form navbar-right"><a href="zip/angular-xeditable-0.2.0.zip" style="font-weight:bold" class="btn btn-primary"><span style="margin-right:10px" class="glyphicon glyphicon-save"></span>Download 0.2.0 ~ 18kb</a></form>
+          <form class="navbar-form navbar-right"><a href="zip/angular-xeditable-0.2.0.zip" style="font-weight:bold" class="btn btn-primary"><span style="margin-right:10px" class="glyphicon glyphicon-save"></span>Download 0.2.0 ~ 27kb</a></form>
           <div style="padding-top: 13px">
 <!-- google+ -->
 <div id="socials" style="text-align: center">
@@ -105,6 +107,7 @@
                   <li><a href="#radiolist">Radiolist</a></li>
                   <li><a href="#bsdate">Date</a></li>
                   <li><a href="#bstime">Time</a></li>
+                  <li><a href="#combodate">DateTime</a></li>
                   <li><a href="#typeahead">Typeahead</a></li>
                 </ul>
               </li>
@@ -173,6 +176,7 @@ to use power of angular and support complex forms / editable grids.</p>
 <li><a href="#radiolist">radio</a></li>
 <li><a href="#bsdate">date</a></li>
 <li><a href="#bstime">time</a></li>
+<li><a href="#combodate">datetime</a></li>
 <li><a href="#html5-inputs">html5 inputs</a>        </li>
 <li><a href="#typeahead">typeahead</a></li>
 </ul>
@@ -663,12 +667,12 @@ $scope.$watch("user", function(v) { $scope.$parent.debug["radiolist"]=v; }); });
                       <!-- watch change of user to update rootScope for debugging-->
                       <h3>demo</h3><a href="http://jsfiddle.net/NfPcH/23/" target="_blank" class="btn btn-info fiddle pull-right">View Bootstrap 2 jsFiddle</a>
                       <div class="well line-example"><div ng-controller="BsdateCtrl">
-  <a href="#" editable-bsdate="user.dob" e-datepicker-popup="dd-MMMM-yyyy">
+  <a href="#" editable-bsdate="user.dob" e-is-open="opened.$data" e-ng-click="open($event,'$data')" e-datepicker-popup="dd-MMMM-yyyy">
     {{ (user.dob | date:"dd/MM/yyyy") || 'empty' }}
   </a>
 </div></div>
                       <pre>{{ debug["bsdate"] | json }}</pre>
-                      <p><p>Date control is implemented via <a href="http://angular-ui.github.io/bootstrap/#/datepicker">Angular-ui bootstrap datepicker</a>.<br><strong>Currently it has only Bootstrap 2 version</strong>, Bootstrap 3 version is <a href="https://github.com/angular-ui/bootstrap/issues?milestone=6">in progress</a>.<br>You should include additional <code>ui-bootstrap-tpls.min.js</code>:</p>
+                      <p><p>Date control is implemented via <a href="http://angular-ui.github.io/bootstrap/#/datepicker">Angular-ui bootstrap datepicker</a>.<br>You should include additional <code>ui-bootstrap-tpls.min.js</code>:</p>
 <pre class="prettyprint">&lt;script src=&quot;//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.6.0/ui-bootstrap-tpls.min.js&quot;&gt;&lt;/script&gt;</pre>
 <p>Add <code>ui.bootstrap</code> as module dependency:</p>
 <pre class="prettyprint">var app = angular.module(&quot;app&quot;, [&quot;xeditable&quot;, &quot;ui.bootstrap&quot;]);</pre>
@@ -677,21 +681,39 @@ Other parameters can be defined via <code>e-*</code> syntax, e.g. <code>e-datepi
 </p>
                       <!--script(src=dir+'/controller.js')-->
                       <script>app.controller('BsdateCtrl', function($scope) {
-  $scope.user = {
-    dob: new Date(1984, 4, 15)
-  };
+	$scope.user = {
+		dob: new Date(1984, 4, 15)
+	};
+
+	$scope.opened = {};
+
+	$scope.open = function($event, elementOpened) {
+		$event.preventDefault();
+		$event.stopPropagation();
+
+		$scope.opened[elementOpened] = !$scope.opened[elementOpened];
+	};
 $scope.$watch("user", function(v) { $scope.$parent.debug["bsdate"]=v; }); });</script>
                       <h3>html</h3>
                       <pre class="prettyprint ng-non-bindable">&lt;div ng-controller=&quot;BsdateCtrl&quot;&gt;
-  &lt;a href=&quot;#&quot; editable-bsdate=&quot;user.dob&quot; e-datepicker-popup=&quot;dd-MMMM-yyyy&quot;&gt;
+  &lt;a href=&quot;#&quot; editable-bsdate=&quot;user.dob&quot; e-is-open=&quot;opened.$data&quot; e-ng-click=&quot;open($event,'$data')&quot; e-datepicker-popup=&quot;dd-MMMM-yyyy&quot;&gt;
     {{ (user.dob | date:&quot;dd/MM/yyyy&quot;) || 'empty' }}
   &lt;/a&gt;
 &lt;/div&gt;</pre>
                       <h3>controller.js</h3>
                       <pre class="prettyprint">app.controller('BsdateCtrl', function($scope) {
-  $scope.user = {
-    dob: new Date(1984, 4, 15)
-  };
+	$scope.user = {
+		dob: new Date(1984, 4, 15)
+	};
+
+	$scope.opened = {};
+
+	$scope.open = function($event, elementOpened) {
+		$event.preventDefault();
+		$event.stopPropagation();
+
+		$scope.opened[elementOpened] = !$scope.opened[elementOpened];
+	};
 });</pre>
                     </section>
                     <section id="bstime">
@@ -746,6 +768,38 @@ $scope.$watch("user", function(v) { $scope.$parent.debug["bstime"]=v; }); });</s
                       <pre class="prettyprint">app.controller('BstimeCtrl', function($scope) {
   $scope.user = {
     time: new Date(1984, 4, 15, 19, 20)
+  };
+});</pre>
+                    </section>
+                    <section id="combodate">
+                      <h1>DateTime</h1>
+                      <!-- watch change of user to update rootScope for debugging-->
+                      <h3>demo</h3>
+                      <div class="well line-example"><div ng-controller="CombodateCtrl">
+  <a href="#" editable-combodate="user.dob">
+    {{ (user.dob | date:"medium") || 'empty' }}
+  </a>
+</div></div>
+                      <pre>{{ debug["combodate"] | json }}</pre>
+                      <p><p>You should include additional <code>moment.js</code>:</p>
+<p>And set <code>editable-combodate</code> attribute in editable element.</p>
+</p>
+                      <!--script(src=dir+'/controller.js')-->
+                      <script>app.controller('CombodateCtrl', function($scope) {
+  $scope.user = {
+    dob: new Date(1984, 4, 15)
+  };
+$scope.$watch("user", function(v) { $scope.$parent.debug["combodate"]=v; }); });</script>
+                      <h3>html</h3>
+                      <pre class="prettyprint ng-non-bindable">&lt;div ng-controller=&quot;CombodateCtrl&quot;&gt;
+  &lt;a href=&quot;#&quot; editable-combodate=&quot;user.dob&quot;&gt;
+    {{ (user.dob | date:&quot;medium&quot;) || 'empty' }}
+  &lt;/a&gt;
+&lt;/div&gt;</pre>
+                      <h3>controller.js</h3>
+                      <pre class="prettyprint">app.controller('CombodateCtrl', function($scope) {
+  $scope.user = {
+    dob: new Date(1984, 4, 15)
   };
 });</pre>
                     </section>
@@ -2333,27 +2387,32 @@ Otherwise, if control is part of form - you should set <code>blur</code> of form
                           <td><code>buttons</code></td>
                           <td>string</td>
                           <td><p>Whether to show ok/cancel buttons. Values: <code>right|no</code>.
-If set to <code>no</code> control automatically submitted when value changed.<br>If control is part of form buttons will never be shown.</p>
+If set to <code>no</code> control automatically submitted when value changed.
+If control is part of form buttons will never be shown.</p>
 </td>
                         </tr>
                         <tr>
                           <td><code>e-*</code></td>
                           <td>any</td>
                           <td><p>Attributes defined with <code>e-*</code> prefix automatically transfered from original element to
-control.<br>For example, if you set <code>&lt;span editable-text=&quot;user.name&quot; e-style=&quot;width: 100px&quot;</code>&gt;
-then input will appear as <code>&lt;input style=&quot;width: 100px&quot;&gt;</code>.<br>See <a href="#text-customize">demo</a>.</p>
+control.
+For example, if you set <code>&lt;span editable-text=&quot;user.name&quot; e-style=&quot;width: 100px&quot;</code>&gt;
+then input will appear as <code>&lt;input style=&quot;width: 100px&quot;&gt;</code>.
+See <a href="#text-customize">demo</a>.</p>
 </td>
                         </tr>
                         <tr>
                           <td><code>onaftersave</code></td>
                           <td>method</td>
-                          <td><p>Called during submit after value is saved to model.<br>See <a href="#onaftersave">demo</a>.</p>
+                          <td><p>Called during submit after value is saved to model.
+See <a href="#onaftersave">demo</a>.</p>
 </td>
                         </tr>
                         <tr>
                           <td><code>onbeforesave</code></td>
                           <td>method</td>
-                          <td><p>Called during submit before value is saved to model.<br>See <a href="#onbeforesave">demo</a>.</p>
+                          <td><p>Called during submit before value is saved to model.
+See <a href="#onbeforesave">demo</a>.</p>
 </td>
                         </tr>
                         <tr>
@@ -2371,7 +2430,8 @@ then input will appear as <code>&lt;input style=&quot;width: 100px&quot;&gt;</co
                         <tr>
                           <td><code>onshow</code></td>
                           <td>method</td>
-                          <td><p>Called when control is shown.<br>See <a href="#select-remote">demo</a>.</p>
+                          <td><p>Called when control is shown.
+See <a href="#select-remote">demo</a>.</p>
 </td>
                         </tr>
                       </tbody>
@@ -2442,7 +2502,7 @@ to model.<br>If at least one children callback returns <code>non-string</code> -
           <h3>Properties</h3><p>Properties are available when you set <code>name</code> attribute of form: </p>
 
           <pre class="prettyprint">&lt;form editable-form name=&quot;myform&quot;&gt;
-// now myform.[property] is available in template and $scope.myform.[property] - in controller
+// now myform[property] is available in template and $scope.myform[property] - in controller
 </pre>
                     <table width="100%" class="table-bordered table-condensed">
                       <thead>
@@ -2470,7 +2530,7 @@ to model.<br>If at least one children callback returns <code>non-string</code> -
           <h3>Methods</h3><p>Methods are available when you set <code>name</code> attribute of form:</p>
 
           <pre class="prettyprint">&lt;form editable-form name=&quot;myform&quot;&gt;
-// now myform.[method] is available in template and $scope.myform.[method] - in controller
+// now myform[method] is available in template and $scope.myform[method] - in controller
 </pre>
                     <table width="100%" class="table-bordered table-condensed">
                       <thead>

@@ -1,5 +1,5 @@
 /**
- * EditableController class. 
+ * EditableController class.
  * Attached to element with `editable-xxx` directive.
  *
  * @namespace editable-element
@@ -7,13 +7,13 @@
 /*
 TODO: this file should be refactored to work more clear without closures!
 */
-angular.module('xeditable').factory('editableController', 
+angular.module('xeditable').factory('editableController',
   ['$q', 'editableUtils',
   function($q, editableUtils) {
 
   //EditableController function
-  EditableController.$inject = ['$scope', '$attrs', '$element', '$parse', 'editableThemes', 'editableOptions', '$rootScope', '$compile', '$q'];
-  function EditableController($scope, $attrs, $element, $parse, editableThemes, editableOptions, $rootScope, $compile, $q) {
+  EditableController.$inject = ['$scope', '$attrs', '$element', '$parse', 'editableThemes', 'editableIcons', 'editableOptions', '$rootScope', '$compile', '$q'];
+  function EditableController($scope, $attrs, $element, $parse, editableThemes, editableIcons, editableOptions, $rootScope, $compile, $q) {
     var valueGetter;
 
     //if control is disabled - it does not participate in waiting process
@@ -31,6 +31,9 @@ angular.module('xeditable').factory('editableController',
     self.theme =  editableThemes[editableOptions.theme] || editableThemes['default'];
     self.parent = {};
 
+    //will be undefined if icon_set is default and theme is default
+    self.icon_set = editableOptions.icon_set === 'default' ? editableIcons.default[editableOptions.theme] : editableIcons.external[editableOptions.icon_set];
+
     //to be overwritten by directive
     self.inputTpl = '';
     self.directiveName = '';
@@ -45,32 +48,32 @@ angular.module('xeditable').factory('editableController',
 
     /**
      * Attributes defined with `e-*` prefix automatically transfered from original element to
-     * control.  
+     * control.
      * For example, if you set `<span editable-text="user.name" e-style="width: 100px"`>
-     * then input will appear as `<input style="width: 100px">`.  
+     * then input will appear as `<input style="width: 100px">`.
      * See [demo](#text-customize).
-     * 
+     *
      * @var {any|attribute} e-*
      * @memberOf editable-element
-     */ 
+     */
 
     /**
      * Whether to show ok/cancel buttons. Values: `right|no`.
-     * If set to `no` control automatically submitted when value changed.  
-     * If control is part of form buttons will never be shown. 
-     * 
+     * If set to `no` control automatically submitted when value changed.
+     * If control is part of form buttons will never be shown.
+     *
      * @var {string|attribute} buttons
      * @memberOf editable-element
-     */    
-    self.buttons = 'right'; 
+     */
+    self.buttons = 'right';
     /**
      * Action when control losses focus. Values: `cancel|submit|ignore`.
      * Has sense only for single editable element.
      * Otherwise, if control is part of form - you should set `blur` of form, not of individual element.
-     * 
+     *
      * @var {string|attribute} blur
      * @memberOf editable-element
-     */     
+     */
     // no real `blur` property as it is transfered to editable form
 
     //init
@@ -105,9 +108,9 @@ angular.module('xeditable').factory('editableController',
       }
 
       /**
-       * Called when control is shown.  
+       * Called when control is shown.
        * See [demo](#select-remote).
-       * 
+       *
        * @var {method|attribute} onshow
        * @memberOf editable-element
        */
@@ -118,8 +121,8 @@ angular.module('xeditable').factory('editableController',
       }
 
       /**
-       * Called when control is hidden after both save or cancel.  
-       * 
+       * Called when control is hidden after both save or cancel.
+       *
        * @var {method|attribute} onhide
        * @memberOf editable-element
        */
@@ -130,8 +133,8 @@ angular.module('xeditable').factory('editableController',
       }
 
       /**
-       * Called when control is cancelled.  
-       * 
+       * Called when control is cancelled.
+       *
        * @var {method|attribute} oncancel
        * @memberOf editable-element
        */
@@ -139,12 +142,12 @@ angular.module('xeditable').factory('editableController',
         self.oncancel = function() {
           return $parse($attrs.oncancel)($scope);
         };
-      }          
+      }
 
       /**
-       * Called during submit before value is saved to model.  
+       * Called during submit before value is saved to model.
        * See [demo](#onbeforesave).
-       * 
+       *
        * @var {method|attribute} onbeforesave
        * @memberOf editable-element
        */
@@ -155,9 +158,9 @@ angular.module('xeditable').factory('editableController',
       }
 
       /**
-       * Called during submit after value is saved to model.  
+       * Called during submit after value is saved to model.
        * See [demo](#onaftersave).
-       * 
+       *
        * @var {method|attribute} onaftersave
        * @memberOf editable-element
        */
@@ -172,6 +175,7 @@ angular.module('xeditable').factory('editableController',
       // Initially this method called with newVal = undefined, oldVal = undefined
       // so no need initially call handleEmpty() explicitly
       $scope.$parent.$watch($attrs[self.directiveName], function(newVal, oldVal) {
+        self.setLocalValue();
         self.handleEmpty();
       });
     };
@@ -191,9 +195,13 @@ angular.module('xeditable').factory('editableController',
         self.buttonsEl = angular.element(theme.buttonsTpl);
         self.submitEl = angular.element(theme.submitTpl);
         self.cancelEl = angular.element(theme.cancelTpl);
+        if(self.icon_set) {
+          self.submitEl.find('span').addClass(self.icon_set.ok);
+          self.cancelEl.find('span').addClass(self.icon_set.cancel);
+        }
         self.buttonsEl.append(self.submitEl).append(self.cancelEl);
         self.controlsEl.append(self.buttonsEl);
-        
+
         self.inputEl.addClass('editable-has-buttons');
       }
 
@@ -219,17 +227,18 @@ angular.module('xeditable').factory('editableController',
         } else {
           continue;
         }
-        
-        // exclude `form` and `ng-submit`, 
+
+        // exclude `form` and `ng-submit`,
         if(transferAttr === 'Form' || transferAttr === 'NgSubmit') {
           continue;
         }
 
         // convert back to lowercase style
-        transferAttr = transferAttr.substring(0, 1).toLowerCase() + editableUtils.camelToDash(transferAttr.substring(1));  
+        transferAttr = transferAttr.substring(0, 1).toLowerCase() + editableUtils.camelToDash(transferAttr.substring(1));
 
         // workaround for attributes without value (e.g. `multiple = "multiple"`)
-        var attrValue = ($attrs[k] === '') ? transferAttr : $attrs[k];
+        // except for 'e-value'
+        var attrValue = (transferAttr !== 'value' && $attrs[k] === '') ? transferAttr : $attrs[k];
 
         // set attributes to input
         self.inputEl.attr(transferAttr, attrValue);
@@ -258,8 +267,8 @@ angular.module('xeditable').factory('editableController',
     // copy MUST NOT be used for `select-multiple` with objects as items
     // copy MUST be used for `checklist`
     self.setLocalValue = function() {
-      self.scope.$data = self.useCopy ? 
-        angular.copy(valueGetter($scope.$parent)) : 
+      self.scope.$data = self.useCopy ?
+        angular.copy(valueGetter($scope.$parent)) :
         valueGetter($scope.$parent);
     };
 
@@ -293,6 +302,7 @@ angular.module('xeditable').factory('editableController',
 
     //hide
     self.hide = function() {
+
       self.editorEl.remove();
       $element.removeClass('editable-hide');
 
@@ -336,7 +346,7 @@ angular.module('xeditable').factory('editableController',
       // click - mark element as clicked to exclude in document click handler
       self.editorEl.bind('click', function(e) {
         // ignore right/middle button click
-        if (e.which !== 1) {
+        if (e.which && e.which !== 1) {
           return;
         }
 
@@ -369,10 +379,19 @@ angular.module('xeditable').factory('editableController',
       }
     };
 
-    self.activate = function() {
+    self.activate = function(start, end) {
       setTimeout(function() {
         var el = self.inputEl[0];
         if (editableOptions.activate === 'focus' && el.focus) {
+          if(start){
+            end = end || start;
+            el.onfocus = function(){
+              var that = this;
+              setTimeout(function(){
+                that.setSelectionRange(start,end);
+              });
+            };
+          }
           el.focus();
         }
         if (editableOptions.activate === 'select' && el.select) {
@@ -416,7 +435,8 @@ angular.module('xeditable').factory('editableController',
     };
 
     self.save = function() {
-      valueGetter.assign($scope.$parent, angular.copy(self.scope.$data));
+      valueGetter.assign($scope.$parent,
+          self.useCopy ? angular.copy(self.scope.$data) : self.scope.$data);
 
       // no need to call handleEmpty here as we are watching change of model value
       // self.handleEmpty();
@@ -427,7 +447,7 @@ angular.module('xeditable').factory('editableController',
     */
     self.handleEmpty = function() {
       var val = valueGetter($scope.$parent);
-      var isEmpty = val === null || val === undefined || val === "" || (angular.isArray(val) && val.length === 0); 
+      var isEmpty = val === null || val === undefined || val === "" || (angular.isArray(val) && val.length === 0);
       $element.toggleClass('editable-empty', isEmpty);
     };
 
