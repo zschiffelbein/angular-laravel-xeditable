@@ -365,36 +365,6 @@ angular.module('xeditable').directive('editableTextarea', ['editableDirectiveFac
     });
 }]);
 
-//select
-angular.module('xeditable').directive('editableUiSelect', ['editableDirectiveFactory',
-    function (editableDirectiveFactory) {
-        return editableDirectiveFactory({
-            directiveName: 'editableUiSelect',
-            inputTpl: '<ui-select></ui-select>',
-            render: function () {
-
-                this.parent.render.call(this);
-
-                var uiSelectMatch = angular.element('<ui-select-match></ui-select-match>');
-                uiSelectMatch.append(this.attrs.eMatch);
-                this.inputEl.append(uiSelectMatch);
-
-                var uiSelectChoices = angular.element('<ui-select-choices></ui-select-choices>');
-                uiSelectChoices.attr('repeat', this.attrs.eRepeat);
-                uiSelectChoices.attr('refresh', this.attrs.eRefresh);
-                uiSelectChoices.attr('refresh-delay', this.attrs.eRefreshDelay);
-                uiSelectChoices.append(this.attrs.eSelectChoices);
-                this.inputEl.append(uiSelectChoices);
-
-                // Remove attributes from parent element
-                this.inputEl.removeAttr('repeat');
-                this.inputEl.removeAttr('refresh');
-                this.inputEl.removeAttr('refresh-delay');
-
-                this.inputEl.removeAttr('class');
-            }
-        });
-    }]);
 /**
  * EditableController class.
  * Attached to element with `editable-xxx` directive.
