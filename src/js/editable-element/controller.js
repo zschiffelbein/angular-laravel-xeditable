@@ -303,6 +303,7 @@ angular.module('xeditable').factory('editableController',
     //hide
     self.hide = function() {
 
+
       self.editorEl.remove();
       $element.removeClass('editable-hide');
 
