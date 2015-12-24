@@ -1,7 +1,7 @@
 /*!
 angular-laravel-xeditable - 0.2.0
 Edit-in-place for angular.js and Laravel server-side validation
-Build date: 2015-10-07 
+Build date: 2015-12-24 
 */
 /**
  * Angular-xeditable module 
@@ -1234,7 +1234,9 @@ angular.module('xeditable').factory('editableFormController',
       this.$activate();
       for (var fieldName in errors) {
         for (var errorKey in errors[fieldName]) {
-          this.$setError(fieldName, errors[fieldName][errorKey]);
+          if(angular.isString(errors[fieldName][errorKey])) {
+            this.$setError(fieldName, errors[fieldName][errorKey]);
+          }
         }
       }
     },

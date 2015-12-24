@@ -256,7 +256,9 @@ angular.module('xeditable').factory('editableFormController',
       this.$activate();
       for (var fieldName in errors) {
         for (var errorKey in errors[fieldName]) {
-          this.$setError(fieldName, errors[fieldName][errorKey]);
+          if(angular.isString(errors[fieldName][errorKey])) {
+            this.$setError(fieldName, errors[fieldName][errorKey]);
+          }
         }
       }
     },
