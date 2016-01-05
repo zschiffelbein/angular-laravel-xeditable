@@ -91,7 +91,7 @@ angular.module('xeditable').directive('editableBsdate', ['editableDirectiveFacto
 			directiveName: 'editableBsdate',
 			inputTpl: '<div></div>',
 			render: function() {
-				/** This basically renders a datepicker as in the example shown in 
+				/** This basically renders a datepicker as in the example shown in
 				**  http://angular-ui.github.io/bootstrap/#/datepicker
 				**  The attributes are all the same as in the bootstrap-ui datepicker with e- as prefix
 				**/
@@ -101,7 +101,7 @@ angular.module('xeditable').directive('editableBsdate', ['editableDirectiveFacto
 				var buttonDatePicker = angular.element('<button type="button" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button>');
 				var buttonWrapper = angular.element('<span class="input-group-btn"></span>');
 
-				inputDatePicker.attr('uib-datepicker-popup');
+				inputDatePicker.attr('uib-datepicker-popup', this.attrs.eDatepickerPopupXEditable || '');
 				inputDatePicker.attr('is-open', this.attrs.eIsOpen);
 				inputDatePicker.attr('date-disabled', this.attrs.eDateDisabled);
 				inputDatePicker.attr('uib-datepicker-popup', this.attrs.eDatepickerPopup);
