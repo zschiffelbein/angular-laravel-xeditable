@@ -18,7 +18,7 @@ angular.module('xeditable').directive('editableBsdate', ['editableDirectiveFacto
 				var buttonDatePicker = angular.element('<button type="button" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button>');
 				var buttonWrapper = angular.element('<span class="input-group-btn"></span>');
 
-				inputDatePicker.attr('uib-datepicker-popup', this.attrs.eDatepickerPopupXEditable || 'yyyy/MM/dd' );
+				inputDatePicker.attr('uib-datepicker-popup');
 				inputDatePicker.attr('is-open', this.attrs.eIsOpen);
 				inputDatePicker.attr('date-disabled', this.attrs.eDateDisabled);
 				inputDatePicker.attr('uib-datepicker-popup', this.attrs.eDatepickerPopup);
