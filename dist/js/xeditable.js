@@ -1,7 +1,7 @@
 /*!
 angular-laravel-xeditable - 0.2.0
 Edit-in-place for angular.js and Laravel server-side validation
-Build date: 2016-01-05 
+Build date: 2018-05-31 
 */
 /**
  * Angular-xeditable module 
@@ -792,7 +792,7 @@ angular.module('xeditable').factory('editableController',
         );
       //check $http error
       } else if (noPromise && angular.isObject(result) && result.status &&
-        (result.status !== 200) && result.data && angular.isString(result.data)) {
+        (result.status !== 200 && result.status !== 204) && result.data && angular.isString(result.data)) {
         this.setError(result.data);
         //set result to string: to let form know that there was error
         result = result.data;

@@ -425,7 +425,7 @@ angular.module('xeditable').factory('editableController',
         );
       //check $http error
       } else if (noPromise && angular.isObject(result) && result.status &&
-        (result.status !== 200) && result.data && angular.isString(result.data)) {
+        (result.status !== 200 && result.status !== 204) && result.data && angular.isString(result.data)) {
         this.setError(result.data);
         //set result to string: to let form know that there was error
         result = result.data;
